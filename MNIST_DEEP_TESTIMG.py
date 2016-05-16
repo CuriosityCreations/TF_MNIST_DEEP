@@ -62,12 +62,17 @@ def predictint(imvalue):
   correct_prediction = tf.equal(tf.argmax(y_conv,1), tf.argmax(y_,1))
   accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
   
-  with tf.Session() as sess:
-        sess.run(tf.initialize_all_variables())
-        saver = tf.train.Saver(tf.trainable_variables())
-        saver.restore(sess, "MNIST_deep.ckpt")
-        prediction = tf.argmax(y_conv,1)
-        return prediction.eval(feed_dict={x: [imvalue], keep_prob:1.0}, session=sess)
+  sess = tf.InteractiveSession()
+  sess.run(tf.initialize_all_variables())
+  saver = tf.train.Saver(tf.trainable_variables())
+  saver.restore(sess, "MNIST_deep.ckpt")
+  prediction = tf.argmax(y_conv,1)
+  topk = tf.nn.top_k(y_conv,3)
+  indices = topk[1].eval(feed_dict={x: [imvalue], keep_prob:1.0}, session = sess)
+  values = topk[0].eval(feed_dict={x: [imvalue], keep_prob:1.0}, session = sess)
+  print("Indices || 1st: %d     || 2nd: %d     || 3rd: %d"%(sum(indices)[0],sum(indices)[1],sum(indices)[2]))
+  print("prob.   || 1st: %.3f || 2nd: %.3f || 3rd: %.3f"%(sum(values)[0],sum(values)[1],sum(values)[2]))
+  return prediction.eval(feed_dict={x: [imvalue], keep_prob:1.0}, session=sess)
 
 def imageprepare(argv):
     """
@@ -103,7 +108,7 @@ def imageprepare(argv):
     tv = list(newImage.getdata()) #get pixel values
     
     #normalize pixels to 0 and 1. 0 is pure white, 1 is pure black.
-    tva = [ round((255-x)*1.0/255.0) for x in tv] 
+    tva = [ (255-x)*1.0/255.0 for x in tv] 
     #print(tva)
     return tva
 
@@ -113,7 +118,7 @@ def main(argv):
     """
     imvalue = imageprepare(argv)
     predint = predictint(imvalue)
-    print (predint[0]) #first value in list
+    #print (predint) #first value in list
     
 if __name__ == "__main__":
     main(sys.argv[1])
