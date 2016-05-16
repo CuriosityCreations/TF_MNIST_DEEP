@@ -7,7 +7,7 @@ Multilayer Convolutional Network with Tensor Flow
 
 python MNIST_DEEP_TRAIN.py 20000
 
-*Test Hand Write with Trained ckpt file:
+*Test Hand Write Image with Trained ckpt file:
 
 python MNIST_DEEP_TESTIMG.py Test/2.png
 
